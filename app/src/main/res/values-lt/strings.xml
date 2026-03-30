@@ -12,4 +12,6 @@
     <string name="app_version">Versija %1$s</string>
     <string name="current_language">Kalba: %1$s</string>
     <string name="language_selector_label">Kalba</string>
+    <string name="login_username_required_error">Vartotojo vardas yra privalomas.</string>
+    <string name="login_password_required_error">Slaptažodis yra privalomas.</string>
 </resources>

@@ -12,4 +12,6 @@
     <string name="app_version">Versie %1$s</string>
     <string name="current_language">Taal: %1$s</string>
     <string name="language_selector_label">Taal</string>
+    <string name="login_username_required_error">Gebruikersnaam is verplicht.</string>
+    <string name="login_password_required_error">Wachtwoord is verplicht.</string>
 </resources>

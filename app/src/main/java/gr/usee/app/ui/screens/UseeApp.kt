@@ -64,6 +64,8 @@ import gr.usee.app.R
 import gr.usee.app.auth.AuthRepository
 import gr.usee.app.auth.LoginCredentials
 import gr.usee.app.auth.LoginResult
+import gr.usee.app.auth.SavedCredential
+import gr.usee.app.auth.SecureCredentialsStore
 import gr.usee.app.i18n.SupportedLanguages
 import gr.usee.app.ui.theme.UseeOfficialAppTheme
 import kotlinx.coroutines.launch
@@ -126,10 +128,18 @@ private fun LoginRoute(
 ) {
     var uiState by rememberSaveable(stateSaver = LoginUiState.Saver) { mutableStateOf(LoginUiState()) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val credentialsStore = remember(context) { SecureCredentialsStore(context.applicationContext) }
+    var savedCredentials by remember { mutableStateOf(credentialsStore.getAll()) }
+    val usernameRequiredMessage = stringResource(id = R.string.login_username_required_error)
+    val passwordRequiredMessage = stringResource(id = R.string.login_password_required_error)
 
-    fun submit() {
-        // Validate locally first so the user gets immediate feedback before the network call.
-        val validatedState = uiState.validated()
+    fun submit(username: String = uiState.username, password: String = uiState.password) {
+        val candidateState = uiState.copy(username = username, password = password)
+        val validatedState = candidateState.validated(
+            usernameRequiredMessage = usernameRequiredMessage,
+            passwordRequiredMessage = passwordRequiredMessage
+        )
         uiState = validatedState
 
         if (!validatedState.isSubmittable) {
@@ -148,6 +158,11 @@ private fun LoginRoute(
                 )
             ) {
                 is LoginResult.Success -> {
+                    credentialsStore.save(
+                        username = validatedState.username,
+                        password = validatedState.password
+                    )
+                    savedCredentials = credentialsStore.getAll()
                     uiState = uiState.copy(isLoading = false, errorMessage = null)
                     onLoginSuccess(result.displayName)
                 }
@@ -175,7 +190,9 @@ private fun LoginRoute(
                 errorMessage = null
             )
         },
-        onSubmit = ::submit,
+        onSubmit = { submit() },
+        savedCredentials = savedCredentials,
+        onQuickLogin = { credential -> submit(credential.username, credential.password) },
         selectedLanguageCode = selectedLanguageCode,
         onLanguageChange = onLanguageChange
     )
@@ -187,6 +204,8 @@ private fun LoginScreen(
     onUsernameChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    savedCredentials: List<SavedCredential>,
+    onQuickLogin: (SavedCredential) -> Unit,
     selectedLanguageCode: String,
     onLanguageChange: (String) -> Unit
 ) {
@@ -197,6 +216,7 @@ private fun LoginScreen(
         val availableWidth = LocalConfiguration.current.screenWidthDp.dp - (horizontalPagePadding * 2)
         val formWidth = if (availableWidth < 700.dp) availableWidth else 600.dp
         var languageMenuExpanded by remember { mutableStateOf(false) }
+        var quickLoginExpanded by remember { mutableStateOf(false) }
         val selectedLanguage = SupportedLanguages.byCode(selectedLanguageCode) ?: SupportedLanguages.default
 
         Box(
@@ -251,24 +271,56 @@ private fun LoginScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        OutlinedTextField(
-                            value = uiState.username,
-                            onValueChange = onUsernameChange,
-                            modifier = Modifier.fillMaxWidth(),
-                            label = { Text(text = stringResource(id = R.string.login_username_label)) },
-                            singleLine = true,
-                            shape = RoundedCornerShape(16.dp),
-                            enabled = !uiState.isLoading,
-                            isError = uiState.usernameError != null,
-                            supportingText = uiState.usernameError?.let { message ->
-                                { Text(text = message) }
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next,
-                                autoCorrectEnabled = false
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedTextField(
+                                value = uiState.username,
+                                onValueChange = onUsernameChange,
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text(text = stringResource(id = R.string.login_username_label)) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(16.dp),
+                                enabled = !uiState.isLoading,
+                                isError = uiState.usernameError != null,
+                                supportingText = uiState.usernameError?.let { message ->
+                                    { Text(text = message) }
+                                },
+                                trailingIcon = {
+                                    if (savedCredentials.isNotEmpty()) {
+                                        Text(
+                                            text = "▼",
+                                            modifier = Modifier
+                                                .padding(end = 4.dp)
+                                                .clickable(enabled = !uiState.isLoading) {
+                                                    quickLoginExpanded = true
+                                                },
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                    }
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Text,
+                                    imeAction = ImeAction.Next,
+                                    autoCorrectEnabled = false
+                                )
                             )
-                        )
+
+                            DropdownMenu(
+                                expanded = quickLoginExpanded,
+                                onDismissRequest = { quickLoginExpanded = false },
+                                modifier = Modifier.align(Alignment.TopEnd)
+                            ) {
+                                savedCredentials.forEach { credential ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = credential.username) },
+                                        onClick = {
+                                            quickLoginExpanded = false
+                                            onQuickLogin(credential)
+                                        }
+                                    )
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(4.dp))
 
@@ -490,12 +542,15 @@ private data class LoginUiState(
     }
 }
 
-private fun LoginUiState.validated(): LoginUiState {
+private fun LoginUiState.validated(
+    usernameRequiredMessage: String,
+    passwordRequiredMessage: String
+): LoginUiState {
     val trimmedUsername = username.trim()
     return copy(
         username = trimmedUsername,
-        usernameError = if (trimmedUsername.isBlank()) "Username is required." else null,
-        passwordError = if (password.isBlank()) "Password is required." else null
+        usernameError = if (trimmedUsername.isBlank()) usernameRequiredMessage else null,
+        passwordError = if (password.isBlank()) passwordRequiredMessage else null
     )
 }
 
@@ -508,6 +563,8 @@ private fun LoginScreenPreview() {
             onUsernameChange = {},
             onPasswordChange = {},
             onSubmit = {},
+            savedCredentials = emptyList(),
+            onQuickLogin = {},
             selectedLanguageCode = "en",
             onLanguageChange = {}
         )

@@ -12,4 +12,6 @@
     <string name="app_version">Version %1$s</string>
     <string name="current_language">Sprache: %1$s</string>
     <string name="language_selector_label">Sprache</string>
+    <string name="login_username_required_error">Benutzername ist erforderlich.</string>
+    <string name="login_password_required_error">Passwort ist erforderlich.</string>
 </resources>

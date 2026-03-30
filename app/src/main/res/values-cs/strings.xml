@@ -12,4 +12,6 @@
     <string name="app_version">Verze %1$s</string>
     <string name="current_language">Jazyk: %1$s</string>
     <string name="language_selector_label">Jazyk</string>
+    <string name="login_username_required_error">Uživatelské jméno je povinné.</string>
+    <string name="login_password_required_error">Heslo je povinné.</string>
 </resources>

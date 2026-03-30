@@ -12,4 +12,6 @@
     <string name="app_version">Версия %1$s</string>
     <string name="current_language">Език: %1$s</string>
     <string name="language_selector_label">Език</string>
+    <string name="login_username_required_error">Потребителското име е задължително.</string>
+    <string name="login_password_required_error">Паролата е задължителна.</string>
 </resources>
