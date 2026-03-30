@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Usee logo</string>
+    <string name="login_title">Sign in</string>
+    <string name="login_subtitle">Use your credentials to continue.</string>
+    <string name="login_username_label">Username</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_button">Login</string>
+    <string name="hello_title">Hello %1$s!</string>
+    <string name="hello_subtitle">You are now connected to the Usee backend.</string>
+    <string name="logout_button">Log out</string>
 </resources>
