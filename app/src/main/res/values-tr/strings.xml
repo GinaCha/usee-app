@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Bir güncelleme mevcut. Güncelleme indirilene kadar 30 saniye bekleyin, ardından uygulamayı yeniden başlatın.</string>
     <string name="update_dialog_update_now">Şimdi güncelle</string>
     <string name="update_dialog_restart_now">Şimdi yeniden başlat</string>
+    <string name="webview_error_title">Bağlantı hatası</string>
+    <string name="webview_error_message">Sayfa yüklenemedi. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="webview_error_retry">Tekrar dene</string>
+    <string name="login_unsuccessful_error">Giriş başarısız. Lütfen bilgilerinizi kontrol edip tekrar deneyin.</string>
 </resources>

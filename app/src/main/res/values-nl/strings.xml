@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Er is een update beschikbaar. Wacht 30 seconden tot de update is gedownload en start daarna de app opnieuw.</string>
     <string name="update_dialog_update_now">Nu bijwerken</string>
     <string name="update_dialog_restart_now">Nu herstarten</string>
+    <string name="webview_error_title">Verbindingsfout</string>
+    <string name="webview_error_message">De pagina kan niet worden geladen. Controleer uw internetverbinding en probeer het opnieuw.</string>
+    <string name="webview_error_retry">Opnieuw proberen</string>
+    <string name="login_unsuccessful_error">Inloggen mislukt. Controleer uw gegevens en probeer het opnieuw.</string>
 </resources>

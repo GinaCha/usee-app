@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Налична е актуализация. Изчакайте 30 секунди, докато се изтегли, след което рестартирайте приложението.</string>
     <string name="update_dialog_update_now">Обнови сега</string>
     <string name="update_dialog_restart_now">Рестартирай сега</string>
+    <string name="webview_error_title">Грешка при свързване</string>
+    <string name="webview_error_message">Страницата не може да бъде заредена. Моля, проверете интернет връзката си и опитайте отново.</string>
+    <string name="webview_error_retry">Опитай отново</string>
+    <string name="login_unsuccessful_error">Неуспешен вход. Моля, проверете данните си и опитайте отново.</string>
 </resources>

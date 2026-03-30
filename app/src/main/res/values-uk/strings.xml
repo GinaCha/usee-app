@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Доступне оновлення. Зачекайте 30 секунд, поки оновлення завантажиться, а потім перезапустіть застосунок.</string>
     <string name="update_dialog_update_now">Оновити зараз</string>
     <string name="update_dialog_restart_now">Перезапустити</string>
+    <string name="webview_error_title">Помилка підключення</string>
+    <string name="webview_error_message">Не вдалося завантажити сторінку. Перевірте підключення до Інтернету та спробуйте знову.</string>
+    <string name="webview_error_retry">Спробувати знову</string>
+    <string name="login_unsuccessful_error">Не вдалося увійти. Перевірте облікові дані та спробуйте ще раз.</string>
 </resources>

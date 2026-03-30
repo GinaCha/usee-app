@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Există o actualizare disponibilă. Așteaptă 30 de secunde până se descarcă, apoi repornește aplicația.</string>
     <string name="update_dialog_update_now">Actualizează acum</string>
     <string name="update_dialog_restart_now">Repornește acum</string>
+    <string name="webview_error_title">Eroare de conexiune</string>
+    <string name="webview_error_message">Pagina nu a putut fi încărcată. Verificați conexiunea la internet și încercați din nou.</string>
+    <string name="webview_error_retry">Încearcă din nou</string>
+    <string name="login_unsuccessful_error">Autentificare eșuată. Verificați datele de conectare și încercați din nou.</string>
 </resources>

@@ -31,12 +31,14 @@ android {
             versionNameSuffix = "-dev"
 
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
+            buildConfigField("String", "WEB_APP_URL", "\"http://10.0.2.2:3000\"")
         }
 
         create("prd") {
             dimension = "environment"
 
             buildConfigField("String", "BASE_URL", "\"https://backend.usee.gr/api/v1/\"")
+            buildConfigField("String", "WEB_APP_URL", "\"https://u-see.gr\"")
         }
     }
 

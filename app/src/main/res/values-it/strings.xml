@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">È disponibile un aggiornamento. Attendi 30 secondi finché l’aggiornamento non è stato scaricato, poi riavvia l’app.</string>
     <string name="update_dialog_update_now">Aggiorna ora</string>
     <string name="update_dialog_restart_now">Riavvia ora</string>
+    <string name="webview_error_title">Errore di connessione</string>
+    <string name="webview_error_message">Impossibile caricare la pagina. Controlla la tua connessione internet e riprova.</string>
+    <string name="webview_error_retry">Riprova</string>
+    <string name="login_unsuccessful_error">Accesso non riuscito. Controlla le credenziali e riprova.</string>
 </resources>

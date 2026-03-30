@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Je dostupná aktualizace. Počkejte 30 sekund, než se stáhne, a poté aplikaci restartujte.</string>
     <string name="update_dialog_update_now">Aktualizovat nyní</string>
     <string name="update_dialog_restart_now">Restartovat nyní</string>
+    <string name="webview_error_title">Chyba připojení</string>
+    <string name="webview_error_message">Stránku se nepodařilo načíst. Zkontrolujte připojení k internetu a zkuste to znovu.</string>
+    <string name="webview_error_retry">Zkusit znovu</string>
+    <string name="login_unsuccessful_error">Přihlášení se nezdařilo. Zkontrolujte své údaje a zkuste to znovu.</string>
 </resources>

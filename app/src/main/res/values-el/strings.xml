@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Υπάρχει διαθέσιμη ενημέρωση. Περιμένετε 30 δευτερόλεπτα μέχρι να ολοκληρωθεί η λήψη και μετά επανεκκινήστε την εφαρμογή.</string>
     <string name="update_dialog_update_now">Ενημέρωση τώρα</string>
     <string name="update_dialog_restart_now">Επανεκκίνηση τώρα</string>
+    <string name="webview_error_title">Σφάλμα σύνδεσης</string>
+    <string name="webview_error_message">Δεν ήταν δυνατή η φόρτωση της σελίδας. Ελέγξτε τη σύνδεσή σας στο διαδίκτυο και δοκιμάστε ξανά.</string>
+    <string name="webview_error_retry">Δοκιμή ξανά</string>
+    <string name="login_unsuccessful_error">Η σύνδεση απέτυχε. Ελέγξτε τα στοιχεία σας και δοκιμάστε ξανά.</string>
 </resources>

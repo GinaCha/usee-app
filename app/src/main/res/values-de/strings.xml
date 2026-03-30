@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Ein Update ist verfügbar. Warten Sie 30 Sekunden, bis das Update heruntergeladen wurde, und starten Sie dann die App neu.</string>
     <string name="update_dialog_update_now">Jetzt aktualisieren</string>
     <string name="update_dialog_restart_now">Jetzt neu starten</string>
+    <string name="webview_error_title">Verbindungsfehler</string>
+    <string name="webview_error_message">Die Seite konnte nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.</string>
+    <string name="webview_error_retry">Erneut versuchen</string>
+    <string name="login_unsuccessful_error">Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten und versuchen Sie es erneut.</string>
 </resources>

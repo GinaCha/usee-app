@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Доступно обновление. Подождите 30 секунд, пока обновление загрузится, затем перезапустите приложение.</string>
     <string name="update_dialog_update_now">Обновить сейчас</string>
     <string name="update_dialog_restart_now">Перезапустить</string>
+    <string name="webview_error_title">Ошибка подключения</string>
+    <string name="webview_error_message">Не удалось загрузить страницу. Проверьте подключение к интернету и попробуйте снова.</string>
+    <string name="webview_error_retry">Повторить попытку</string>
+    <string name="login_unsuccessful_error">Не удалось войти. Проверьте данные и попробуйте снова.</string>
 </resources>

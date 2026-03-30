@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">يتوفر تحديث. انتظر 30 ثانية حتى يكتمل التنزيل ثم أعد تشغيل التطبيق.</string>
     <string name="update_dialog_update_now">حدّث الآن</string>
     <string name="update_dialog_restart_now">أعد التشغيل الآن</string>
+    <string name="webview_error_title">خطأ في الاتصال</string>
+    <string name="webview_error_message">تعذّر تحميل الصفحة. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
+    <string name="webview_error_retry">حاول مجدداً</string>
+    <string name="login_unsuccessful_error">فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد والمحاولة مرة أخرى.</string>
 </resources>

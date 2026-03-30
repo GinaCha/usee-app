@@ -4,6 +4,7 @@ import gr.usee.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.util.Base64
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -37,11 +38,31 @@ class AuthRepository {
             when {
                 response.code == HttpURLConnection.HTTP_NOT_FOUND -> continue
                 response.code in HttpURLConnection.HTTP_OK..299 -> {
+                    // Backend can respond with HTTP 200 while still signaling a logical
+                    // authentication failure through a non-SUCCESS `code` field.
+                    // In that case, treat the login as unsuccessful.
+                    if (!isSuccessfulLoginResponse(response.body)) {
+                        return@withContext LoginResult.Failure(
+                            message = extractErrorMessage(response.body)
+                                ?: "Login unsuccessful. Please check your credentials and try again."
+                        )
+                    }
+
+                    val bearerToken = extractBearerToken(response.authorizationHeader, response.body)
+                    val authCookie = extractAuthCookie(response.setCookieHeaders, response.body)
+                    val role = extractRole(
+                        responseBody = response.body,
+                        bearerToken = bearerToken
+                    )
+
                     return@withContext LoginResult.Success(
                         displayName = extractDisplayName(
                             responseBody = response.body,
                             fallbackUsername = sanitizedCredentials.username
-                        )
+                        ),
+                        role = role,
+                        bearerToken = bearerToken,
+                        authCookie = authCookie
                     )
                 }
                 else -> {
@@ -77,7 +98,12 @@ class AuthRepository {
 
             val statusCode = connection.responseCode
             val responseBody = connection.readBody()
-            ApiResponse(code = statusCode, body = responseBody)
+            ApiResponse(
+                code = statusCode,
+                body = responseBody,
+                authorizationHeader = connection.getHeaderField("Authorization"),
+                setCookieHeaders = connection.getHeaderFields()["Set-Cookie"].orEmpty()
+            )
         } finally {
             connection.disconnect()
         }
@@ -119,6 +145,109 @@ class AuthRepository {
         return plainMessage.takeIf { it.isNotBlank() }?.take(200)
     }
 
+    /**
+     * Determines whether login should be considered successful from payload semantics,
+     * not just HTTP status code.
+     *
+     * Rule: if top-level or nested `code` exists and is not `SUCCESS`, login is treated
+     * as failed. If no `code` is present, behavior falls back to HTTP status handling.
+     */
+    private fun isSuccessfulLoginResponse(responseBody: String): Boolean {
+        val json = responseBody.toJsonObjectOrNull() ?: return true
+        val code = json.optMeaningfulString("code")
+            ?: json.optJSONObject("data")?.optMeaningfulString("code")
+            ?: return true
+
+        return code.equals("SUCCESS", ignoreCase = true)
+    }
+
+    private fun extractBearerToken(authorizationHeader: String?, responseBody: String): String? {
+        val headerToken = authorizationHeader
+            ?.trim()
+            ?.removePrefix("Bearer ")
+            ?.takeIf { it.isNotBlank() }
+        if (!headerToken.isNullOrBlank()) {
+            return headerToken
+        }
+
+        val json = responseBody.toJsonObjectOrNull() ?: return null
+        val data = json.optJSONObject("data") ?: json
+        return data.optMeaningfulString("token", "accessToken", "jwt")
+            ?.removePrefix("Bearer ")
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+    }
+
+    private fun extractAuthCookie(setCookieHeaders: List<String>, responseBody: String): String? {
+        val headerCookie = setCookieHeaders.firstNotNullOfOrNull { header ->
+            val cookiePart = header.substringBefore(';').trim()
+            cookiePart.takeIf { it.startsWith("auth_token=") }
+                ?.substringAfter("auth_token=")
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+        }
+        if (!headerCookie.isNullOrBlank()) {
+            return headerCookie
+        }
+
+        val json = responseBody.toJsonObjectOrNull() ?: return null
+        val data = json.optJSONObject("data") ?: json
+        return data.optMeaningfulString("auth_token", "authToken", "cookie")
+    }
+
+    private fun extractRole(responseBody: String, bearerToken: String?): String {
+        // 1. Try extracting role from JWT payload
+        val tokenRole = bearerToken?.let { token ->
+            runCatching {
+                val payloadPart = token.split('.').getOrNull(1) ?: return@runCatching null
+                val decoded = Base64.getUrlDecoder().decode(payloadPart)
+                val payloadJson = JSONObject(String(decoded, Charsets.UTF_8))
+                payloadJson.optMeaningfulString("role", "userRole", "type")
+                    ?: payloadJson.optJSONArray("role")
+                        ?.optString(0)
+                        ?.trim()
+                        ?.takeIf { it.isNotBlank() }
+            }.getOrNull()
+        }
+        if (!tokenRole.isNullOrBlank()) {
+            return unquoteStringifiedJson(tokenRole).toString()
+        }
+
+        // 2. Try extracting role from response body
+        val json = responseBody.toJsonObjectOrNull()
+        val data = json?.optJSONObject("data") ?: json
+
+        val bodyRole = data?.optMeaningfulString("role", "userRole", "type")
+            ?: data?.optJSONObject("user")?.optMeaningfulString("role", "userRole", "type")
+
+        return unquoteStringifiedJson(bodyRole) ?: "CUSTOMER"
+    }
+
+    /**
+     * Unquotes stringified JSON strings. For example:
+     * - Input: `"\"ADMIN\""` → Output: `"ADMIN"`
+     * - Input: `"ADMIN"` → Output: `"ADMIN"`
+     * - Input: `null` → Output: `null`
+     *
+     * This handles cases where backend sends role as a JSON-encoded string value.
+     */
+    private fun unquoteStringifiedJson(value: String?): String? {
+        if (value.isNullOrBlank()) {
+            return value
+        }
+
+        return runCatching {
+            val trimmed = value.trim()
+            // If value is wrapped in quotes and starts/ends with \", parse as JSON string
+            if (trimmed.startsWith("\"") && trimmed.endsWith("\"")) {
+                JSONObject("""{"v":$trimmed}""").optString("v").takeIf { it.isNotBlank() }
+                    ?: value
+            } else {
+                value
+            }
+        }.getOrElse { value }
+    }
+
     private fun String.toJsonObjectOrNull(): JSONObject? = runCatching { JSONObject(this) }.getOrNull()
 
     private fun JSONObject.optMeaningfulString(vararg keys: String): String? =
@@ -135,17 +264,14 @@ class AuthRepository {
 
     private data class ApiResponse(
         val code: Int,
-        val body: String
+        val body: String,
+        val authorizationHeader: String?,
+        val setCookieHeaders: List<String>
     )
 
     private companion object {
         val loginPaths = listOf(
-//            "auth/login",
-//            "login",
-//            "api/auth/login",
-//            "api/login",
-//            "v1/auth/login",
-            "auth/login"
+            "firebase/auth/login"
         )
     }
 }
@@ -158,6 +284,11 @@ data class LoginCredentials(
 }
 
 sealed interface LoginResult {
-    data class Success(val displayName: String) : LoginResult
+    data class Success(
+        val displayName: String,
+        val role: String,
+        val bearerToken: String?,
+        val authCookie: String?
+    ) : LoginResult
     data class Failure(val message: String) : LoginResult
 }

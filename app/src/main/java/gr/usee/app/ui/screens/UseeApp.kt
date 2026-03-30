@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -62,21 +63,34 @@ import android.content.Intent
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
+import android.widget.Toast
+import android.webkit.CookieManager
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.viewinterop.AndroidView
 import gr.usee.app.BuildConfig
+import java.net.URI
 import java.util.Locale
 import gr.usee.app.R
 import gr.usee.app.auth.AuthRepository
+import gr.usee.app.auth.AuthSession
 import gr.usee.app.auth.LoginCredentials
 import gr.usee.app.auth.LoginResult
 import gr.usee.app.auth.SavedCredential
 import gr.usee.app.auth.SecureCredentialsStore
+import gr.usee.app.auth.SecureSessionStore
+import gr.usee.app.auth.UserOptionsRepository
+import gr.usee.app.auth.UserOptionsResult
 import gr.usee.app.i18n.SupportedLanguages
 import gr.usee.app.update.AppUpdateRepository
 import gr.usee.app.update.UpdatePolicy
 import gr.usee.app.ui.theme.UseeOfficialAppTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 /**
  * Root app composable.
@@ -90,7 +104,7 @@ import kotlinx.coroutines.launch
 fun UseeApp(
     authRepository: AuthRepository = remember { AuthRepository() }
 ) {
-    var authenticatedUsername by rememberSaveable { mutableStateOf<String?>(null) }
+    var authenticatedSession by remember { mutableStateOf<AuthSession?>(null) }
 
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
@@ -136,20 +150,30 @@ fun UseeApp(
         }
 
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            if (authenticatedUsername == null) {
+            if (authenticatedSession == null) {
                 LoginRoute(
                     authRepository = authRepository,
-                    onLoginSuccess = { username -> authenticatedUsername = username },
+                    onLoginSuccess = { session -> authenticatedSession = session },
                     selectedLanguageCode = selectedLanguageCode,
                     onLanguageChange = { code ->
                         selectedLanguageCode = code
                         prefs.edit().putString("selected_language", code).apply()
                     }
                 )
-            } else {
+            } else if (containsRole(authenticatedSession?.role, "CUSTOMER")) {
                 HelloScreen(
-                    username = authenticatedUsername.orEmpty(),
-                    onLogout = { authenticatedUsername = null }
+                    username = authenticatedSession?.displayName.orEmpty(),
+                    onLogout = { authenticatedSession = null }
+                )
+            } else {
+                StaffWebViewScreen(
+                    session = authenticatedSession ?: return@Surface,
+                    selectedLanguageCode = selectedLanguageCode,
+                    onLanguageChange = { code ->
+                        selectedLanguageCode = code
+                        prefs.edit().putString("selected_language", code).apply()
+                    },
+                    onLogout = { authenticatedSession = null }
                 )
             }
         }
@@ -206,7 +230,7 @@ private fun ForceUpdateDialog(
 @Composable
 private fun LoginRoute(
     authRepository: AuthRepository,
-    onLoginSuccess: (String) -> Unit,
+    onLoginSuccess: (AuthSession) -> Unit,
     selectedLanguageCode: String,
     onLanguageChange: (String) -> Unit
 ) {
@@ -214,9 +238,12 @@ private fun LoginRoute(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val credentialsStore = remember(context) { SecureCredentialsStore(context.applicationContext) }
+    val secureSessionStore = remember(context) { SecureSessionStore(context.applicationContext) }
+    val userOptionsRepository = remember { UserOptionsRepository() }
     var savedCredentials by remember { mutableStateOf(credentialsStore.getAll()) }
     val usernameRequiredMessage = stringResource(id = R.string.login_username_required_error)
     val passwordRequiredMessage = stringResource(id = R.string.login_password_required_error)
+    val loginUnsuccessfulMessage = stringResource(id = R.string.login_unsuccessful_error)
 
     fun submit(username: String = uiState.username, password: String = uiState.password) {
         val candidateState = uiState.copy(username = username, password = password)
@@ -246,12 +273,44 @@ private fun LoginRoute(
                         username = validatedState.username,
                         password = validatedState.password
                     )
+
+                    val role = result.role.trim().ifBlank { "ANONYMOUS" }
+                    var session = AuthSession(
+                        displayName = result.displayName,
+                        role = role,
+                        bearerToken = result.bearerToken,
+                        authCookie = result.authCookie
+                    )
+
+                    if (!containsRole(role, "CUSTOMER") and !containsRole(role, "ANONYMOUS")) {
+                        val token = result.bearerToken.orEmpty()
+                        when (val userOptions = userOptionsRepository.fetchUserOptions(token)) {
+                            is UserOptionsResult.Success -> {
+                                session = session.copy(mobileDashboard = userOptions.dashboard)
+                            }
+
+                            is UserOptionsResult.Failure -> {
+                                uiState = uiState.copy(isLoading = false, errorMessage = userOptions.message)
+                                return@launch
+                            }
+                        }
+                    }
+
+                    secureSessionStore.save(session)
                     savedCredentials = credentialsStore.getAll()
                     uiState = uiState.copy(isLoading = false, errorMessage = null)
-                    onLoginSuccess(result.displayName)
+                    onLoginSuccess(session)
                 }
 
                 is LoginResult.Failure -> {
+                    // Show a localized toast for logical login failures (e.g. HTTP 200
+                    // with backend `code != SUCCESS`) while still rendering server detail
+                    // in the inline error box when available.
+                    Toast.makeText(
+                        context,
+                        loginUnsuccessfulMessage,
+                        Toast.LENGTH_LONG
+                    ).show()
                     uiState = uiState.copy(isLoading = false, errorMessage = result.message)
                 }
             }
@@ -611,6 +670,324 @@ private fun restartApplication(context: Context) {
 private const val SILENT_UPDATE_WAIT_MS = 30_000L
 
 private const val PRIVACY_POLICY_URL = "https://usee.gr/privacy-policy"
+private const val WEB_TOKEN_STORAGE_KEY = "token"
+
+/**
+ * Checks whether a given role exists inside a raw roles string.
+ *
+ * The rawRoles input may contain roles in a loosely formatted string,
+ * such as: "[\"ADMIN\", \"USER\"]" or "ADMIN,USER" or "ADMIN; USER".
+ *
+ * The function normalizes both the input roles and the target role
+ * to ensure case-insensitive comparison.
+ *
+ * @param rawRoles The raw string containing roles (nullable).
+ * @param role The role to search for.
+ * @return true if the role is found, false otherwise.
+ */
+private fun containsRole(rawRoles: String?, role: String): Boolean {
+    // Normalize the target role: trim whitespace and convert to uppercase
+    val target = role.trim().uppercase(Locale.ROOT)
+
+    // If the target role is empty after trimming, it's invalid → return false
+    if (target.isBlank()) {
+        return false
+    }
+
+    // Process the rawRoles string into a clean list of tokens:
+    val tokens = rawRoles
+        .orEmpty() // Convert null to empty string to avoid NullPointerException
+        .replace("[", "") // Remove opening bracket (if JSON-like format)
+        .replace("]", "") // Remove closing bracket
+        .split(',', ';') // Split roles by comma or semicolon
+        .map {
+            it.trim()              // Remove surrounding whitespace
+                .trim('"', '\'')     // Remove surrounding quotes (single or double)
+        }
+        .filter { it.isNotBlank() } // Ignore empty tokens
+
+    // Check if any token matches the target role (case-insensitive)
+    return tokens.any { it.uppercase(Locale.ROOT) == target }
+}
+/**
+ * Hosts non-customer users in a WebView and injects auth context for seamless SSO.
+ *
+ * - Stores bearer token in `localStorage`
+ * - Stores `auth_token` in browser cookies
+ *
+ * @author Georgia Chatzimarkaki
+ */
+@Composable
+private fun StaffWebViewScreen(
+    session: AuthSession,
+    selectedLanguageCode: String,
+    onLanguageChange: (String) -> Unit,
+    onLogout: () -> Unit
+) {
+    val context = LocalContext.current
+    val mobileDashboard = session.mobileDashboard
+    val menuEntries = mobileDashboard?.mobileMenuEntries.orEmpty()
+    var currentUrl by rememberSaveable {
+        mutableStateOf(resolveDashboardUrl(mobileDashboard?.homePageURL, session.bearerToken))
+    }
+    var userMenuExpanded by remember { mutableStateOf(false) }
+    var languageMenuExpanded by remember { mutableStateOf(false) }
+    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    var webViewError by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            TextButton(
+                onClick = { userMenuExpanded = true },
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Text(text = "👤", color = Color.Black)
+            }
+
+            DropdownMenu(
+                expanded = userMenuExpanded,
+                onDismissRequest = { userMenuExpanded = false },
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = session.displayName) },
+                    onClick = {},
+                    enabled = false
+                )
+
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.language_selector_label)) },
+                    onClick = {
+                        userMenuExpanded = false
+                        languageMenuExpanded = true
+                    }
+                )
+
+                menuEntries.forEach { entry ->
+                    DropdownMenuItem(
+                        text = { Text(text = entry.label) },
+                        onClick = {
+                            userMenuExpanded = false
+                            currentUrl = resolveDashboardUrl(entry.redirectURL, session.bearerToken)
+                            webViewRef?.loadUrl(currentUrl)
+                        }
+                    )
+                }
+
+                DropdownMenuItem(
+                    text = { Text(text = stringResource(id = R.string.logout_button)) },
+                    onClick = {
+                        userMenuExpanded = false
+                        onLogout()
+                    }
+                )
+            }
+
+            DropdownMenu(
+                expanded = languageMenuExpanded,
+                onDismissRequest = { languageMenuExpanded = false },
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                SupportedLanguages.all.forEach { language ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(text = language.flagEmoji)
+                                Text(text = language.nativeName)
+                            }
+                        },
+                        onClick = {
+                            languageMenuExpanded = false
+                            onLanguageChange(language.code)
+                        }
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            AndroidView(
+                factory = {
+                    WebView(context).apply {
+                        webViewRef = this
+                        settings.javaScriptEnabled = true
+                        settings.domStorageEnabled = true
+
+                        val cookieManager = CookieManager.getInstance()
+                        cookieManager.setAcceptCookie(true)
+                        session.authCookie?.takeIf { it.isNotBlank() }?.let { authCookieValue ->
+                            cookieManager.setCookie(
+                                BuildConfig.WEB_APP_URL,
+                                "auth_token=$authCookieValue; Path=/"
+                            )
+                            cookieManager.flush()
+                        }
+
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageStarted(
+                                view: WebView?,
+                                url: String?,
+                                favicon: android.graphics.Bitmap?
+                            ) {
+                                super.onPageStarted(view, url, favicon)
+                                // Hide the overlay on every new navigation attempt.
+                                webViewError = false
+                            }
+
+                            override fun onReceivedError(
+                                view: WebView?,
+                                request: WebResourceRequest?,
+                                error: WebResourceError?
+                            ) {
+                                super.onReceivedError(view, request, error)
+                                if (request?.isForMainFrame == true) {
+                                    // Keep the last failed URL so "Try again" retries the same destination.
+                                    request.url?.toString()?.let { failedUrl ->
+                                        currentUrl = resolveDashboardUrl(failedUrl, session.bearerToken)
+                                    }
+                                    webViewError = true
+                                }
+                            }
+
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                session.bearerToken?.takeIf { it.isNotBlank() }?.let { token ->
+                                    val escapedToken = JSONObject.quote(token)
+                                    view?.evaluateJavascript(
+                                        "localStorage.setItem('$WEB_TOKEN_STORAGE_KEY', $escapedToken);",
+                                        null
+                                    )
+                                }
+                            }
+                        }
+
+                        loadUrl(currentUrl)
+                    }
+                },
+                update = { webView ->
+                    if (webView.url != currentUrl) {
+                        webView.loadUrl(currentUrl)
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+
+            if (webViewError) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(32.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.webview_error_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = stringResource(id = R.string.webview_error_message),
+                            textAlign = TextAlign.Center
+                        )
+                        Button(onClick = {
+                            // Force a fresh request; `reload()` may be a no-op after connection-refused failures.
+                            webViewError = false
+                            webViewRef?.stopLoading()
+                            webViewRef?.loadUrl(currentUrl)
+                        }) {
+                            Text(text = stringResource(id = R.string.webview_error_retry))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Resolves dashboard URLs against `WEB_APP_URL` so dev uses localhost domain
+ * while preserving the backend-provided path/query/fragment.
+ *
+ * @author Georgia Chatzimarkaki
+ */
+private fun resolveDashboardUrl(rawUrl: String?): String {
+    return resolveDashboardUrl(rawUrl = rawUrl, bearerToken = null)
+}
+
+/**
+ * Normalizes dashboard URLs to the app's `WEB_APP_URL` host and appends `token` query
+ * when a non-blank bearer token is available.
+ *
+ * Rules:
+ * - absolute URLs keep path/query/fragment, but host is remapped to `WEB_APP_URL`
+ * - relative URLs are resolved against `WEB_APP_URL`
+ * - token is appended safely through [appendTokenQuery]
+ */
+private fun resolveDashboardUrl(rawUrl: String?, bearerToken: String?): String {
+    val baseUri = URI.create(BuildConfig.WEB_APP_URL)
+    val candidate = rawUrl?.trim().orEmpty()
+
+    if (candidate.isBlank()) {
+        return appendTokenQuery(baseUri.toString(), bearerToken)
+    }
+
+    return runCatching {
+        val candidateUri = URI.create(candidate)
+
+        if (candidateUri.isAbsolute) {
+            val path = candidateUri.rawPath ?: "/"
+            val query = candidateUri.rawQuery?.let { "?$it" } ?: ""
+            val fragment = candidateUri.rawFragment?.let { "#$it" } ?: ""
+            appendTokenQuery(baseUri.resolve("$path$query$fragment").toString(), bearerToken)
+        } else {
+            appendTokenQuery(baseUri.resolve(candidateUri.toString()).toString(), bearerToken)
+        }
+    }.getOrElse {
+        appendTokenQuery(baseUri.toString(), bearerToken)
+    }
+}
+
+/**
+ * Appends `token=<encoded bearerToken>` to a URL while preserving existing query params
+ * and fragments. Returns the original URL if token is blank or URL parsing fails.
+ */
+private fun appendTokenQuery(url: String, bearerToken: String?): String {
+    val token = bearerToken?.trim().orEmpty()
+    if (token.isBlank()) {
+        return url
+    }
+
+    return runCatching {
+        val uri = URI.create(url)
+        val encodedToken = Uri.encode(token)
+        val baseWithoutFragment = "${uri.scheme}://${uri.authority}${uri.rawPath ?: ""}"
+        val existingQuery = uri.rawQuery?.takeIf { it.isNotBlank() }
+        val fragment = uri.rawFragment?.let { "#$it" } ?: ""
+
+        val queryWithToken = if (existingQuery == null) {
+            "token=$encodedToken"
+        } else {
+            "$existingQuery&token=$encodedToken"
+        }
+
+        "$baseWithoutFragment?$queryWithToken$fragment"
+    }.getOrElse {
+        url
+    }
+}
 
 @Composable
 private fun HelloScreen(

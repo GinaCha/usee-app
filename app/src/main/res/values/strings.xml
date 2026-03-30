@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">There is an update available. Wait 30 seconds until the update has downloaded and then restart the app.</string>
     <string name="update_dialog_update_now">Update now</string>
     <string name="update_dialog_restart_now">Restart now</string>
+    <string name="webview_error_title">Connection error</string>
+    <string name="webview_error_message">Unable to load the page. Please check your internet connection and try again.</string>
+    <string name="webview_error_retry">Try again</string>
+    <string name="login_unsuccessful_error">Login unsuccessful. Please check your credentials and try again.</string>
 </resources>

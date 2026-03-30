@@ -3,6 +3,7 @@ package gr.usee.app.auth
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import androidx.core.content.edit
 
 /**
  * Represents one saved account used for secure quick-login.
@@ -41,10 +42,10 @@ class SecureCredentialsStore(context: Context) {
         usernames.remove(sanitizedUsername)
         usernames.add(sanitizedUsername)
 
-        securePrefs.edit()
-            .putStringSet(KEY_USERNAMES, usernames)
-            .putString(passwordKey(sanitizedUsername), password)
-            .apply()
+        securePrefs.edit {
+            putStringSet(KEY_USERNAMES, usernames)
+                .putString(passwordKey(sanitizedUsername), password)
+        }
     }
 
     /**

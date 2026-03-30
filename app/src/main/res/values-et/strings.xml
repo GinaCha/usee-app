@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Uuendus on saadaval. Oota 30 sekundit, kuni see alla laaditakse, ja seejärel taaskäivita rakendus.</string>
     <string name="update_dialog_update_now">Uuenda kohe</string>
     <string name="update_dialog_restart_now">Taaskäivita kohe</string>
+    <string name="webview_error_title">Ühenduse viga</string>
+    <string name="webview_error_message">Lehe laadimine ebaõnnestus. Kontrollige oma internetiühendust ja proovige uuesti.</string>
+    <string name="webview_error_retry">Proovi uuesti</string>
+    <string name="login_unsuccessful_error">Sisselogimine ebaõnnestus. Kontrollige oma andmeid ja proovige uuesti.</string>
 </resources>

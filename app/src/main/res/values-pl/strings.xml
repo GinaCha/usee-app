@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Dostępna jest aktualizacja. Poczekaj 30 sekund, aż się pobierze, a następnie uruchom aplikację ponownie.</string>
     <string name="update_dialog_update_now">Aktualizuj teraz</string>
     <string name="update_dialog_restart_now">Uruchom ponownie</string>
+    <string name="webview_error_title">Błąd połączenia</string>
+    <string name="webview_error_message">Nie można załadować strony. Sprawdź połączenie z internetem i spróbuj ponownie.</string>
+    <string name="webview_error_retry">Spróbuj ponownie</string>
+    <string name="login_unsuccessful_error">Logowanie nie powiodło się. Sprawdź dane logowania i spróbuj ponownie.</string>
 </resources>

@@ -20,4 +20,8 @@
     <string name="update_dialog_silent_message">Une mise à jour est disponible. Attendez 30 secondes que la mise à jour soit téléchargée, puis redémarrez l’application.</string>
     <string name="update_dialog_update_now">Mettre à jour</string>
     <string name="update_dialog_restart_now">Redémarrer</string>
+    <string name="webview_error_title">Erreur de connexion</string>
+    <string name="webview_error_message">Impossible de charger la page. Veuillez vérifier votre connexion internet et réessayer.</string>
+    <string name="webview_error_retry">Réessayer</string>
+    <string name="login_unsuccessful_error">Échec de la connexion. Vérifiez vos identifiants et réessayez.</string>
 </resources>
