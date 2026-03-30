@@ -145,7 +145,7 @@ class AuthRepository {
 //            "api/auth/login",
 //            "api/login",
 //            "v1/auth/login",
-            "api/v1/auth/login"
+            "auth/login"
         )
     }
 }

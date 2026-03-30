@@ -17,8 +17,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("int", "LATEST_AVAILABLE_VERSION_CODE", "1")
-        buildConfigField("boolean", "IS_STORE_UPDATE", "true")
+        buildConfigField("String", "UPDATE_SECRET_KEY", "\"\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,15 +30,13 @@ android {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
 
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
-            buildConfigField("boolean", "IS_STORE_UPDATE", "false")
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
         }
 
         create("prd") {
             dimension = "environment"
 
-            buildConfigField("String", "BASE_URL", "\"https://backend.usee.gr/\"")
-            buildConfigField("boolean", "IS_STORE_UPDATE", "true")
+            buildConfigField("String", "BASE_URL", "\"https://backend.usee.gr/api/v1/\"")
         }
     }
 

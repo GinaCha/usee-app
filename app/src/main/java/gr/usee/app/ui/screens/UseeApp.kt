@@ -72,6 +72,8 @@ import gr.usee.app.auth.LoginResult
 import gr.usee.app.auth.SavedCredential
 import gr.usee.app.auth.SecureCredentialsStore
 import gr.usee.app.i18n.SupportedLanguages
+import gr.usee.app.update.AppUpdateRepository
+import gr.usee.app.update.UpdatePolicy
 import gr.usee.app.ui.theme.UseeOfficialAppTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -95,8 +97,9 @@ fun UseeApp(
     var selectedLanguageCode by rememberSaveable {
         mutableStateOf(prefs.getString("selected_language", SupportedLanguages.currentLanguageCode()) ?: SupportedLanguages.currentLanguageCode())
     }
-    val updatePolicy = remember { currentUpdatePolicy() }
-    var showUpdateDialog by rememberSaveable { mutableStateOf(updatePolicy.isUpdateAvailable) }
+    val appUpdateRepository = remember { AppUpdateRepository() }
+    var updatePolicy by remember { mutableStateOf<UpdatePolicy?>(null) }
+    var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
 
     val localizedContext = remember(selectedLanguageCode) {
         val locale = Locale.forLanguageTag(selectedLanguageCode)
@@ -105,10 +108,16 @@ fun UseeApp(
         context.createConfigurationContext(config)
     }
 
+    LaunchedEffect(Unit) {
+        val latestPolicy = appUpdateRepository.checkForLatestVersion(BuildConfig.VERSION_CODE)
+        updatePolicy = latestPolicy
+        showUpdateDialog = latestPolicy.isUpdateAvailable
+    }
+
     CompositionLocalProvider(LocalContext provides localizedContext) {
-        if (showUpdateDialog) {
+        if (showUpdateDialog && updatePolicy != null) {
             ForceUpdateDialog(
-                isStoreUpdate = updatePolicy.isStoreUpdate,
+                isStoreUpdate = updatePolicy?.isStoreUpdate == true,
                 onUpdateFromStore = {
                     openPlayStoreListing(localizedContext)
                 },
@@ -117,8 +126,8 @@ fun UseeApp(
                 }
             )
 
-            if (!updatePolicy.isStoreUpdate) {
-                LaunchedEffect(updatePolicy.isStoreUpdate) {
+            if (updatePolicy?.isStoreUpdate == false) {
+                LaunchedEffect(updatePolicy?.isStoreUpdate) {
                     delay(SILENT_UPDATE_WAIT_MS)
                     showUpdateDialog = false
                     restartApplication(localizedContext)
@@ -598,24 +607,6 @@ private fun restartApplication(context: Context) {
     context.startActivity(launchIntent)
     Runtime.getRuntime().exit(0)
 }
-
-/**
- * Computes the update strategy based on BuildConfig values.
- *
- * @author Georgia Chatzimarkaki
- */
-private fun currentUpdatePolicy(): UpdatePolicy {
-    val isUpdateAvailable = BuildConfig.LATEST_AVAILABLE_VERSION_CODE > BuildConfig.VERSION_CODE
-    return UpdatePolicy(
-        isUpdateAvailable = isUpdateAvailable,
-        isStoreUpdate = BuildConfig.IS_STORE_UPDATE
-    )
-}
-
-private data class UpdatePolicy(
-    val isUpdateAvailable: Boolean,
-    val isStoreUpdate: Boolean
-)
 
 private const val SILENT_UPDATE_WAIT_MS = 30_000L
 
