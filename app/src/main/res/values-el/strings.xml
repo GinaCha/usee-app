@@ -12,6 +12,7 @@
     <string name="app_version">Έκδοση %1$s</string>
     <string name="current_language">Γλώσσα: %1$s</string>
     <string name="language_selector_label">Γλώσσα</string>
+    <string name="privacy_policy_link_label">Πολιτική Απορρήτου</string>
     <string name="login_username_required_error">Το όνομα χρήστη είναι υποχρεωτικό.</string>
     <string name="login_password_required_error">Ο κωδικός πρόσβασης είναι υποχρεωτικός.</string>
 </resources>

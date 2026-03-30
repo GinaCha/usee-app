@@ -12,6 +12,7 @@
     <string name="app_version">Versiunea %1$s</string>
     <string name="current_language">Limbă: %1$s</string>
     <string name="language_selector_label">Limbă</string>
+    <string name="privacy_policy_link_label">Politica de confidențialitate</string>
     <string name="login_username_required_error">Numele de utilizator este obligatoriu.</string>
     <string name="login_password_required_error">Parola este obligatorie.</string>
 </resources>

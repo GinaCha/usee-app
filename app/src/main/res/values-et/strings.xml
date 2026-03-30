@@ -12,6 +12,7 @@
     <string name="app_version">Versioon %1$s</string>
     <string name="current_language">Keel: %1$s</string>
     <string name="language_selector_label">Keel</string>
+    <string name="privacy_policy_link_label">Privaatsuspoliitika</string>
     <string name="login_username_required_error">Kasutajanimi on kohustuslik.</string>
     <string name="login_password_required_error">Parool on kohustuslik.</string>
 </resources>

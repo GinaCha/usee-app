@@ -1,5 +1,6 @@
 package gr.usee.app.ui.screens
 
+import android.content.ActivityNotFoundException
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,8 +56,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import android.content.Intent
 import android.content.Context
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.runtime.CompositionLocalProvider
 import gr.usee.app.BuildConfig
 import java.util.Locale
@@ -210,6 +213,7 @@ private fun LoginScreen(
     onLanguageChange: (String) -> Unit
 ) {
     Scaffold { innerPadding ->
+        val context = LocalContext.current
         val logoSize = 150.dp
         val logoHalfHeight = 75.dp
         val horizontalPagePadding = 24.dp
@@ -444,14 +448,48 @@ private fun LoginScreen(
                 text = stringResource(id = R.string.app_version, BuildConfig.VERSION_NAME),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 2.dp),
+                    .padding(bottom = 18.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f)
             )
+
+            Text(
+                text = stringResource(id = R.string.privacy_policy_link_label),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 2.dp)
+                    .clickable(enabled = !uiState.isLoading) {
+                        openExternalUrl(
+                            context = context,
+                            url = PRIVACY_POLICY_URL
+                        )
+                    },
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
+
+/**
+ * Opens an external browser for a URL used by legal links (e.g. privacy policy).
+ *
+ * @author Georgia Chatzimarkaki
+ */
+private fun openExternalUrl(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    try {
+        context.startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+    }
+}
+
+private const val PRIVACY_POLICY_URL = "https://usee.gr/privacy-policy"
 
 @Composable
 private fun HelloScreen(

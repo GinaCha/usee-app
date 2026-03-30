@@ -12,6 +12,7 @@
     <string name="app_version">Sürüm %1$s</string>
     <string name="current_language">Dil: %1$s</string>
     <string name="language_selector_label">Dil</string>
+    <string name="privacy_policy_link_label">Gizlilik Politikası</string>
     <string name="login_username_required_error">Kullanıcı adı zorunludur.</string>
     <string name="login_password_required_error">Şifre zorunludur.</string>
 </resources>

@@ -12,6 +12,7 @@
     <string name="app_version">Версия %1$s</string>
     <string name="current_language">Язык: %1$s</string>
     <string name="language_selector_label">Язык</string>
+    <string name="privacy_policy_link_label">Политика конфиденциальности</string>
     <string name="login_username_required_error">Требуется имя пользователя.</string>
     <string name="login_password_required_error">Требуется пароль.</string>
 </resources>

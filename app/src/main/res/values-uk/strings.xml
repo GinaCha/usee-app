@@ -12,6 +12,7 @@
     <string name="app_version">Версія %1$s</string>
     <string name="current_language">Мова: %1$s</string>
     <string name="language_selector_label">Мова</string>
+    <string name="privacy_policy_link_label">Політика конфіденційності</string>
     <string name="login_username_required_error">Ім’я користувача обов’язкове.</string>
     <string name="login_password_required_error">Пароль обов’язковий.</string>
 </resources>

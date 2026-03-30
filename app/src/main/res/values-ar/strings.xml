@@ -12,6 +12,7 @@
     <string name="app_version">الإصدار %1$s</string>
     <string name="current_language">اللغة: %1$s</string>
     <string name="language_selector_label">اللغة</string>
+    <string name="privacy_policy_link_label">سياسة الخصوصية</string>
     <string name="login_username_required_error">اسم المستخدم مطلوب.</string>
     <string name="login_password_required_error">كلمة المرور مطلوبة.</string>
 </resources>
