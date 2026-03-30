@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Лого на Usee</string>
+    <string name="login_title">Вход</string>
+    <string name="login_subtitle">Използвайте вашите данни за вход, за да продължите.</string>
+    <string name="login_username_label">Потребителско име</string>
+    <string name="login_password_label">Парола</string>
+    <string name="login_button">Вход</string>
+    <string name="hello_title">Здравей, %1$s!</string>
+    <string name="hello_subtitle">Вече сте свързани с Usee.</string>
+    <string name="logout_button">Изход</string>
+    <string name="app_version">Версия %1$s</string>
+    <string name="current_language">Език: %1$s</string>
+    <string name="language_selector_label">Език</string>
+</resources>

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Usee logosu</string>
+    <string name="login_title">Giriş yap</string>
+    <string name="login_subtitle">Devam etmek için kimlik bilgilerinizi kullanın.</string>
+    <string name="login_username_label">Kullanıcı adı</string>
+    <string name="login_password_label">Şifre</string>
+    <string name="login_button">Giriş</string>
+    <string name="hello_title">Merhaba %1$s!</string>
+    <string name="hello_subtitle">Artık Usee\'ye bağlısınız.</string>
+    <string name="logout_button">Çıkış yap</string>
+    <string name="app_version">Sürüm %1$s</string>
+    <string name="current_language">Dil: %1$s</string>
+    <string name="language_selector_label">Dil</string>
+</resources>

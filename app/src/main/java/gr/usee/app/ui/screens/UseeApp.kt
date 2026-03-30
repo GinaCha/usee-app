@@ -2,9 +2,11 @@ package gr.usee.app.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +24,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -41,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,11 +55,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import android.content.Context
+import android.content.res.Configuration
+import androidx.compose.runtime.CompositionLocalProvider
 import gr.usee.app.BuildConfig
+import java.util.Locale
 import gr.usee.app.R
 import gr.usee.app.auth.AuthRepository
 import gr.usee.app.auth.LoginCredentials
 import gr.usee.app.auth.LoginResult
+import gr.usee.app.i18n.SupportedLanguages
 import gr.usee.app.ui.theme.UseeOfficialAppTheme
 import kotlinx.coroutines.launch
 
@@ -72,17 +82,37 @@ fun UseeApp(
 ) {
     var authenticatedUsername by rememberSaveable { mutableStateOf<String?>(null) }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        if (authenticatedUsername == null) {
-            LoginRoute(
-                authRepository = authRepository,
-                onLoginSuccess = { username -> authenticatedUsername = username }
-            )
-        } else {
-            HelloScreen(
-                username = authenticatedUsername.orEmpty(),
-                onLogout = { authenticatedUsername = null }
-            )
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE) }
+    var selectedLanguageCode by rememberSaveable {
+        mutableStateOf(prefs.getString("selected_language", SupportedLanguages.currentLanguageCode()) ?: SupportedLanguages.currentLanguageCode())
+    }
+
+    val localizedContext = remember(selectedLanguageCode) {
+        val locale = Locale.forLanguageTag(selectedLanguageCode)
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+        context.createConfigurationContext(config)
+    }
+
+    CompositionLocalProvider(LocalContext provides localizedContext) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            if (authenticatedUsername == null) {
+                LoginRoute(
+                    authRepository = authRepository,
+                    onLoginSuccess = { username -> authenticatedUsername = username },
+                    selectedLanguageCode = selectedLanguageCode,
+                    onLanguageChange = { code ->
+                        selectedLanguageCode = code
+                        prefs.edit().putString("selected_language", code).apply()
+                    }
+                )
+            } else {
+                HelloScreen(
+                    username = authenticatedUsername.orEmpty(),
+                    onLogout = { authenticatedUsername = null }
+                )
+            }
         }
     }
 }
@@ -90,7 +120,9 @@ fun UseeApp(
 @Composable
 private fun LoginRoute(
     authRepository: AuthRepository,
-    onLoginSuccess: (String) -> Unit
+    onLoginSuccess: (String) -> Unit,
+    selectedLanguageCode: String,
+    onLanguageChange: (String) -> Unit
 ) {
     var uiState by rememberSaveable(stateSaver = LoginUiState.Saver) { mutableStateOf(LoginUiState()) }
     val scope = rememberCoroutineScope()
@@ -143,7 +175,9 @@ private fun LoginRoute(
                 errorMessage = null
             )
         },
-        onSubmit = ::submit
+        onSubmit = ::submit,
+        selectedLanguageCode = selectedLanguageCode,
+        onLanguageChange = onLanguageChange
     )
 }
 
@@ -152,7 +186,9 @@ private fun LoginScreen(
     uiState: LoginUiState,
     onUsernameChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: () -> Unit,
+    selectedLanguageCode: String,
+    onLanguageChange: (String) -> Unit
 ) {
     Scaffold { innerPadding ->
         val logoSize = 150.dp
@@ -160,6 +196,8 @@ private fun LoginScreen(
         val horizontalPagePadding = 24.dp
         val availableWidth = LocalConfiguration.current.screenWidthDp.dp - (horizontalPagePadding * 2)
         val formWidth = if (availableWidth < 700.dp) availableWidth else 600.dp
+        var languageMenuExpanded by remember { mutableStateOf(false) }
+        val selectedLanguage = SupportedLanguages.byCode(selectedLanguageCode) ?: SupportedLanguages.default
 
         Box(
             modifier = Modifier
@@ -308,14 +346,53 @@ private fun LoginScreen(
                             .size(logoSize+ 40.dp)
 
                     )
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = (-12).dp, y = (logoHalfHeight + 14.dp))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .clickable(enabled = !uiState.isLoading) {
+                                    languageMenuExpanded = true
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = selectedLanguage.flagEmoji)
+                        }
+
+                        DropdownMenu(
+                            expanded = languageMenuExpanded,
+                            onDismissRequest = { languageMenuExpanded = false }
+                        ) {
+                            SupportedLanguages.all.forEach { language ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Text(text = language.flagEmoji)
+                                            Text(text = language.nativeName)
+                                        }
+                                    },
+                                    onClick = {
+                                        languageMenuExpanded = false
+                                        onLanguageChange(language.code)
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
             Text(
-                text = "Version ${BuildConfig.VERSION_NAME}",
+                text = stringResource(id = R.string.app_version, BuildConfig.VERSION_NAME),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 2.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f)
@@ -430,7 +507,9 @@ private fun LoginScreenPreview() {
             uiState = LoginUiState(),
             onUsernameChange = {},
             onPasswordChange = {},
-            onSubmit = {}
+            onSubmit = {},
+            selectedLanguageCode = "en",
+            onLanguageChange = {}
         )
     }
 }

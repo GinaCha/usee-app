@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Usee logo</string>
+    <string name="login_title">Logi sisse</string>
+    <string name="login_subtitle">Jätkamiseks kasuta oma kasutajatunnuseid.</string>
+    <string name="login_username_label">Kasutajanimi</string>
+    <string name="login_password_label">Parool</string>
+    <string name="login_button">Logi sisse</string>
+    <string name="hello_title">Tere %1$s!</string>
+    <string name="hello_subtitle">Olete nüüd ühendatud Usee-ga.</string>
+    <string name="logout_button">Logi välja</string>
+    <string name="app_version">Versioon %1$s</string>
+    <string name="current_language">Keel: %1$s</string>
+    <string name="language_selector_label">Keel</string>
+</resources>

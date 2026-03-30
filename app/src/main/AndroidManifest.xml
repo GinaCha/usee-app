@@ -13,7 +13,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.UseeOfficialApp">
+        android:theme="@style/Theme.UseeOfficialApp"
+        android:localeConfig="@xml/locales_config">
+
+        <!-- Persist the selected language across app restarts via AppCompat -->
+        <meta-data
+            android:name="autoStoreLocales"
+            android:value="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

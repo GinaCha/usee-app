@@ -9,4 +9,7 @@
     <string name="hello_title">Hello %1$s!</string>
     <string name="hello_subtitle">You are now connected to the Usee backend.</string>
     <string name="logout_button">Log out</string>
+    <string name="app_version">Version %1$s</string>
+    <string name="current_language">Language: %1$s</string>
+    <string name="language_selector_label">Language</string>
 </resources>

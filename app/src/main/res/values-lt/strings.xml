@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Usee logotipas</string>
+    <string name="login_title">Prisijungti</string>
+    <string name="login_subtitle">Norėdami tęsti, naudokite savo prisijungimo duomenis.</string>
+    <string name="login_username_label">Vartotojo vardas</string>
+    <string name="login_password_label">Slaptažodis</string>
+    <string name="login_button">Prisijungti</string>
+    <string name="hello_title">Sveiki, %1$s!</string>
+    <string name="hello_subtitle">Dabar esate prisijungę prie Usee.</string>
+    <string name="logout_button">Atsijungti</string>
+    <string name="app_version">Versija %1$s</string>
+    <string name="current_language">Kalba: %1$s</string>
+    <string name="language_selector_label">Kalba</string>
+</resources>

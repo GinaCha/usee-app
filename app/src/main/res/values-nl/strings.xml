@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Usee-logo</string>
+    <string name="login_title">Inloggen</string>
+    <string name="login_subtitle">Gebruik je inloggegevens om door te gaan.</string>
+    <string name="login_username_label">Gebruikersnaam</string>
+    <string name="login_password_label">Wachtwoord</string>
+    <string name="login_button">Inloggen</string>
+    <string name="hello_title">Hallo %1$s!</string>
+    <string name="hello_subtitle">Je bent nu verbonden met Usee.</string>
+    <string name="logout_button">Uitloggen</string>
+    <string name="app_version">Versie %1$s</string>
+    <string name="current_language">Taal: %1$s</string>
+    <string name="language_selector_label">Taal</string>
+</resources>

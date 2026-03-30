@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">شعار Usee</string>
+    <string name="login_title">تسجيل الدخول</string>
+    <string name="login_subtitle">استخدم بيانات اعتمادك للمتابعة.</string>
+    <string name="login_username_label">اسم المستخدم</string>
+    <string name="login_password_label">كلمة المرور</string>
+    <string name="login_button">دخول</string>
+    <string name="hello_title">مرحبًا %1$s!</string>
+    <string name="hello_subtitle">أنت الآن متصل بـ Usee </string>
+    <string name="logout_button">تسجيل الخروج</string>
+    <string name="app_version">الإصدار %1$s</string>
+    <string name="current_language">اللغة: %1$s</string>
+    <string name="language_selector_label">اللغة</string>
+</resources>

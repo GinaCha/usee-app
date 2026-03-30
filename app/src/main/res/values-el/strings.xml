@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Λογότυπο Usee</string>
+    <string name="login_title">Σύνδεση</string>
+    <string name="login_subtitle">Χρησιμοποιήστε τα διαπιστευτήριά σας για να συνεχίσετε.</string>
+    <string name="login_username_label">Όνομα χρήστη</string>
+    <string name="login_password_label">Κωδικός πρόσβασης</string>
+    <string name="login_button">Είσοδος</string>
+    <string name="hello_title">Γεια σου %1$s!</string>
+    <string name="hello_subtitle">Είστε πλέον συνδεδεμένοι με τη Usee.</string>
+    <string name="logout_button">Αποσύνδεση</string>
+    <string name="app_version">Έκδοση %1$s</string>
+    <string name="current_language">Γλώσσα: %1$s</string>
+    <string name="language_selector_label">Γλώσσα</string>
+</resources>

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Sigla Usee</string>
+    <string name="login_title">Autentificare</string>
+    <string name="login_subtitle">Folosește datele tale de autentificare pentru a continua.</string>
+    <string name="login_username_label">Nume utilizator</string>
+    <string name="login_password_label">Parolă</string>
+    <string name="login_button">Conectare</string>
+    <string name="hello_title">Salut %1$s!</string>
+    <string name="hello_subtitle">Acum sunteți conectat la Usee.</string>
+    <string name="logout_button">Deconectare</string>
+    <string name="app_version">Versiunea %1$s</string>
+    <string name="current_language">Limbă: %1$s</string>
+    <string name="language_selector_label">Limbă</string>
+</resources>

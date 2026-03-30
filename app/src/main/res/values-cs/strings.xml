@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Usee Official App</string>
+    <string name="login_logo_content_description">Logo Usee</string>
+    <string name="login_title">Přihlášení</string>
+    <string name="login_subtitle">Použijte své přihlašovací údaje pro pokračování.</string>
+    <string name="login_username_label">Uživatelské jméno</string>
+    <string name="login_password_label">Heslo</string>
+    <string name="login_button">Přihlásit se</string>
+    <string name="hello_title">Ahoj %1$s!</string>
+    <string name="hello_subtitle">Nyní jste připojeni k Usee.</string>
+    <string name="logout_button">Odhlásit se</string>
+    <string name="app_version">Verze %1$s</string>
+    <string name="current_language">Jazyk: %1$s</string>
+    <string name="language_selector_label">Jazyk</string>
+</resources>
