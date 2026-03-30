@@ -50,6 +50,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import gr.usee.app.BuildConfig
 import gr.usee.app.R
 import gr.usee.app.auth.AuthRepository
 import gr.usee.app.auth.LoginCredentials
@@ -172,6 +173,7 @@ private fun LoginScreen(
                 modifier = Modifier
                     .width(formWidth)
                     .fillMaxHeight()
+                    .padding(bottom = 28.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -308,6 +310,16 @@ private fun LoginScreen(
                     )
                 }
             }
+
+            Text(
+                text = "Version ${BuildConfig.VERSION_NAME}",
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f)
+            )
         }
     }
 }
