@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Informativa sulla privacy</string>
         <string name="login_username_required_error">Il nome utente è obbligatorio.</string>
         <string name="login_password_required_error">La password è obbligatoria.</string>
+    <string name="update_dialog_title">Aggiornamento disponibile</string>
+    <string name="update_dialog_store_message">È disponibile un aggiornamento per questa app. Aggiorna dallo store per continuare a usarla.</string>
+    <string name="update_dialog_silent_message">È disponibile un aggiornamento. Attendi 30 secondi finché l’aggiornamento non è stato scaricato, poi riavvia l’app.</string>
+    <string name="update_dialog_update_now">Aggiorna ora</string>
+    <string name="update_dialog_restart_now">Riavvia ora</string>
 </resources>

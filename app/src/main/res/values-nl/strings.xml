@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Privacybeleid</string>
     <string name="login_username_required_error">Gebruikersnaam is verplicht.</string>
     <string name="login_password_required_error">Wachtwoord is verplicht.</string>
+    <string name="update_dialog_title">Update beschikbaar</string>
+    <string name="update_dialog_store_message">Er is een update beschikbaar voor deze app. Werk bij via de store om de app te blijven gebruiken.</string>
+    <string name="update_dialog_silent_message">Er is een update beschikbaar. Wacht 30 seconden tot de update is gedownload en start daarna de app opnieuw.</string>
+    <string name="update_dialog_update_now">Nu bijwerken</string>
+    <string name="update_dialog_restart_now">Nu herstarten</string>
 </resources>

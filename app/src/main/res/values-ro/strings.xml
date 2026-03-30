@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Politica de confidențialitate</string>
     <string name="login_username_required_error">Numele de utilizator este obligatoriu.</string>
     <string name="login_password_required_error">Parola este obligatorie.</string>
+    <string name="update_dialog_title">Actualizare disponibilă</string>
+    <string name="update_dialog_store_message">Este disponibilă o actualizare pentru această aplicație. Actualizează din magazin pentru a continua utilizarea.</string>
+    <string name="update_dialog_silent_message">Există o actualizare disponibilă. Așteaptă 30 de secunde până se descarcă, apoi repornește aplicația.</string>
+    <string name="update_dialog_update_now">Actualizează acum</string>
+    <string name="update_dialog_restart_now">Repornește acum</string>
 </resources>

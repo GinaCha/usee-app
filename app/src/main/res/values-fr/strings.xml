@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Politique de confidentialité</string>
     <string name="login_username_required_error">Le nom d’utilisateur est requis.</string>
     <string name="login_password_required_error">Le mot de passe est requis.</string>
+    <string name="update_dialog_title">Mise à jour disponible</string>
+    <string name="update_dialog_store_message">Une mise à jour est disponible pour cette application. Veuillez la mettre à jour depuis le store pour continuer à l’utiliser.</string>
+    <string name="update_dialog_silent_message">Une mise à jour est disponible. Attendez 30 secondes que la mise à jour soit téléchargée, puis redémarrez l’application.</string>
+    <string name="update_dialog_update_now">Mettre à jour</string>
+    <string name="update_dialog_restart_now">Redémarrer</string>
 </resources>

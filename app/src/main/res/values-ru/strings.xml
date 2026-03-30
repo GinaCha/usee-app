@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Политика конфиденциальности</string>
     <string name="login_username_required_error">Требуется имя пользователя.</string>
     <string name="login_password_required_error">Требуется пароль.</string>
+    <string name="update_dialog_title">Доступно обновление</string>
+    <string name="update_dialog_store_message">Для этого приложения доступно обновление. Пожалуйста, обновите его из магазина, чтобы продолжить использование.</string>
+    <string name="update_dialog_silent_message">Доступно обновление. Подождите 30 секунд, пока обновление загрузится, затем перезапустите приложение.</string>
+    <string name="update_dialog_update_now">Обновить сейчас</string>
+    <string name="update_dialog_restart_now">Перезапустить</string>
 </resources>

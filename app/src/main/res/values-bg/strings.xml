@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Политика за поверителност</string>
     <string name="login_username_required_error">Потребителското име е задължително.</string>
     <string name="login_password_required_error">Паролата е задължителна.</string>
+    <string name="update_dialog_title">Налична е актуализация</string>
+    <string name="update_dialog_store_message">Налична е актуализация за това приложение. Моля, обновете го от магазина, за да продължите да го използвате.</string>
+    <string name="update_dialog_silent_message">Налична е актуализация. Изчакайте 30 секунди, докато се изтегли, след което рестартирайте приложението.</string>
+    <string name="update_dialog_update_now">Обнови сега</string>
+    <string name="update_dialog_restart_now">Рестартирай сега</string>
 </resources>

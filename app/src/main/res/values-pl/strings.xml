@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Polityka prywatności</string>
     <string name="login_username_required_error">Nazwa użytkownika jest wymagana.</string>
     <string name="login_password_required_error">Hasło jest wymagane.</string>
+    <string name="update_dialog_title">Dostępna aktualizacja</string>
+    <string name="update_dialog_store_message">Dla tej aplikacji jest dostępna aktualizacja. Zaktualizuj ją ze sklepu, aby nadal z niej korzystać.</string>
+    <string name="update_dialog_silent_message">Dostępna jest aktualizacja. Poczekaj 30 sekund, aż się pobierze, a następnie uruchom aplikację ponownie.</string>
+    <string name="update_dialog_update_now">Aktualizuj teraz</string>
+    <string name="update_dialog_restart_now">Uruchom ponownie</string>
 </resources>

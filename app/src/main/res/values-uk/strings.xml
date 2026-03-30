@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Політика конфіденційності</string>
     <string name="login_username_required_error">Ім’я користувача обов’язкове.</string>
     <string name="login_password_required_error">Пароль обов’язковий.</string>
+    <string name="update_dialog_title">Доступне оновлення</string>
+    <string name="update_dialog_store_message">Для цього застосунку доступне оновлення. Оновіть його з магазину, щоб продовжити користування.</string>
+    <string name="update_dialog_silent_message">Доступне оновлення. Зачекайте 30 секунд, поки оновлення завантажиться, а потім перезапустіть застосунок.</string>
+    <string name="update_dialog_update_now">Оновити зараз</string>
+    <string name="update_dialog_restart_now">Перезапустити</string>
 </resources>

@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Πολιτική Απορρήτου</string>
     <string name="login_username_required_error">Το όνομα χρήστη είναι υποχρεωτικό.</string>
     <string name="login_password_required_error">Ο κωδικός πρόσβασης είναι υποχρεωτικός.</string>
+    <string name="update_dialog_title">Διαθέσιμη ενημέρωση</string>
+    <string name="update_dialog_store_message">Υπάρχει διαθέσιμη ενημέρωση για αυτή την εφαρμογή. Παρακαλώ ενημερώστε από το store για να συνεχίσετε να τη χρησιμοποιείτε.</string>
+    <string name="update_dialog_silent_message">Υπάρχει διαθέσιμη ενημέρωση. Περιμένετε 30 δευτερόλεπτα μέχρι να ολοκληρωθεί η λήψη και μετά επανεκκινήστε την εφαρμογή.</string>
+    <string name="update_dialog_update_now">Ενημέρωση τώρα</string>
+    <string name="update_dialog_restart_now">Επανεκκίνηση τώρα</string>
 </resources>

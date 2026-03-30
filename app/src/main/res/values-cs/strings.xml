@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Zásady ochrany osobních údajů</string>
     <string name="login_username_required_error">Uživatelské jméno je povinné.</string>
     <string name="login_password_required_error">Heslo je povinné.</string>
+    <string name="update_dialog_title">Dostupná aktualizace</string>
+    <string name="update_dialog_store_message">Pro tuto aplikaci je dostupná aktualizace. Aktualizujte ji prosím z obchodu, abyste ji mohli dál používat.</string>
+    <string name="update_dialog_silent_message">Je dostupná aktualizace. Počkejte 30 sekund, než se stáhne, a poté aplikaci restartujte.</string>
+    <string name="update_dialog_update_now">Aktualizovat nyní</string>
+    <string name="update_dialog_restart_now">Restartovat nyní</string>
 </resources>

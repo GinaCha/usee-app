@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Privaatsuspoliitika</string>
     <string name="login_username_required_error">Kasutajanimi on kohustuslik.</string>
     <string name="login_password_required_error">Parool on kohustuslik.</string>
+    <string name="update_dialog_title">Uuendus on saadaval</string>
+    <string name="update_dialog_store_message">Sellele rakendusele on saadaval uuendus. Jätkamiseks palun uuenda rakendus poest.</string>
+    <string name="update_dialog_silent_message">Uuendus on saadaval. Oota 30 sekundit, kuni see alla laaditakse, ja seejärel taaskäivita rakendus.</string>
+    <string name="update_dialog_update_now">Uuenda kohe</string>
+    <string name="update_dialog_restart_now">Taaskäivita kohe</string>
 </resources>

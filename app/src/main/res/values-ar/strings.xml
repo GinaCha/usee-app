@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">سياسة الخصوصية</string>
     <string name="login_username_required_error">اسم المستخدم مطلوب.</string>
     <string name="login_password_required_error">كلمة المرور مطلوبة.</string>
+    <string name="update_dialog_title">تحديث متاح</string>
+    <string name="update_dialog_store_message">يتوفر تحديث لهذا التطبيق. يرجى التحديث من المتجر للاستمرار في استخدامه.</string>
+    <string name="update_dialog_silent_message">يتوفر تحديث. انتظر 30 ثانية حتى يكتمل التنزيل ثم أعد تشغيل التطبيق.</string>
+    <string name="update_dialog_update_now">حدّث الآن</string>
+    <string name="update_dialog_restart_now">أعد التشغيل الآن</string>
 </resources>

@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Datenschutzerklärung</string>
     <string name="login_username_required_error">Benutzername ist erforderlich.</string>
     <string name="login_password_required_error">Passwort ist erforderlich.</string>
+    <string name="update_dialog_title">Update verfügbar</string>
+    <string name="update_dialog_store_message">Für diese App ist ein Update verfügbar. Bitte aktualisieren Sie sie im Store, um sie weiterhin zu nutzen.</string>
+    <string name="update_dialog_silent_message">Ein Update ist verfügbar. Warten Sie 30 Sekunden, bis das Update heruntergeladen wurde, und starten Sie dann die App neu.</string>
+    <string name="update_dialog_update_now">Jetzt aktualisieren</string>
+    <string name="update_dialog_restart_now">Jetzt neu starten</string>
 </resources>

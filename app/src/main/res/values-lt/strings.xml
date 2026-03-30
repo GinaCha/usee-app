@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Privatumo politika</string>
     <string name="login_username_required_error">Vartotojo vardas yra privalomas.</string>
     <string name="login_password_required_error">Slaptažodis yra privalomas.</string>
+    <string name="update_dialog_title">Yra naujinimas</string>
+    <string name="update_dialog_store_message">Šiai programai yra naujinimas. Atnaujinkite ją iš parduotuvės, kad galėtumėte toliau naudotis.</string>
+    <string name="update_dialog_silent_message">Yra naujinimas. Palaukite 30 sekundžių, kol jis bus atsisiųstas, tada paleiskite programą iš naujo.</string>
+    <string name="update_dialog_update_now">Atnaujinti dabar</string>
+    <string name="update_dialog_restart_now">Paleisti iš naujo</string>
 </resources>

@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Privacy Policy</string>
     <string name="login_username_required_error">Username is required.</string>
     <string name="login_password_required_error">Password is required.</string>
+    <string name="update_dialog_title">Update available</string>
+    <string name="update_dialog_store_message">An update is available for this app. Please update from the store in order to keep using it.</string>
+    <string name="update_dialog_silent_message">There is an update available. Wait 30 seconds until the update has downloaded and then restart the app.</string>
+    <string name="update_dialog_update_now">Update now</string>
+    <string name="update_dialog_restart_now">Restart now</string>
 </resources>

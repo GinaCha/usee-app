@@ -27,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -71,6 +73,7 @@ import gr.usee.app.auth.SavedCredential
 import gr.usee.app.auth.SecureCredentialsStore
 import gr.usee.app.i18n.SupportedLanguages
 import gr.usee.app.ui.theme.UseeOfficialAppTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -92,6 +95,8 @@ fun UseeApp(
     var selectedLanguageCode by rememberSaveable {
         mutableStateOf(prefs.getString("selected_language", SupportedLanguages.currentLanguageCode()) ?: SupportedLanguages.currentLanguageCode())
     }
+    val updatePolicy = remember { currentUpdatePolicy() }
+    var showUpdateDialog by rememberSaveable { mutableStateOf(updatePolicy.isUpdateAvailable) }
 
     val localizedContext = remember(selectedLanguageCode) {
         val locale = Locale.forLanguageTag(selectedLanguageCode)
@@ -101,6 +106,26 @@ fun UseeApp(
     }
 
     CompositionLocalProvider(LocalContext provides localizedContext) {
+        if (showUpdateDialog) {
+            ForceUpdateDialog(
+                isStoreUpdate = updatePolicy.isStoreUpdate,
+                onUpdateFromStore = {
+                    openPlayStoreListing(localizedContext)
+                },
+                onSilentRestart = {
+                    restartApplication(localizedContext)
+                }
+            )
+
+            if (!updatePolicy.isStoreUpdate) {
+                LaunchedEffect(updatePolicy.isStoreUpdate) {
+                    delay(SILENT_UPDATE_WAIT_MS)
+                    showUpdateDialog = false
+                    restartApplication(localizedContext)
+                }
+            }
+        }
+
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             if (authenticatedUsername == null) {
                 LoginRoute(
@@ -120,6 +145,53 @@ fun UseeApp(
             }
         }
     }
+}
+
+/**
+ * Forced update popup shown when a newer app version is marked as available.
+ *
+ * @author Georgia Chatzimarkaki
+ */
+@Composable
+private fun ForceUpdateDialog(
+    isStoreUpdate: Boolean,
+    onUpdateFromStore: () -> Unit,
+    onSilentRestart: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = {},
+        title = {
+            Text(text = stringResource(id = R.string.update_dialog_title))
+        },
+        text = {
+            Text(
+                text = if (isStoreUpdate) {
+                    stringResource(id = R.string.update_dialog_store_message)
+                } else {
+                    stringResource(id = R.string.update_dialog_silent_message)
+                }
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (isStoreUpdate) {
+                        onUpdateFromStore()
+                    } else {
+                        onSilentRestart()
+                    }
+                }
+            ) {
+                Text(
+                    text = if (isStoreUpdate) {
+                        stringResource(id = R.string.update_dialog_update_now)
+                    } else {
+                        stringResource(id = R.string.update_dialog_restart_now)
+                    }
+                )
+            }
+        }
+    )
 }
 
 @Composable
@@ -488,6 +560,64 @@ private fun openExternalUrl(context: Context, url: String) {
     } catch (_: ActivityNotFoundException) {
     }
 }
+
+/**
+ * Opens this app's listing page in Play Store.
+ *
+ * @author Georgia Chatzimarkaki
+ */
+private fun openPlayStoreListing(context: Context) {
+    val packageName = context.packageName
+    val marketIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    val webIntent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+    ).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    try {
+        context.startActivity(marketIntent)
+    } catch (_: ActivityNotFoundException) {
+        context.startActivity(webIntent)
+    }
+}
+
+/**
+ * Restarts the application process after a silent update completes.
+ *
+ * @author Georgia Chatzimarkaki
+ */
+private fun restartApplication(context: Context) {
+    val packageManager = context.packageManager
+    val launchIntent = packageManager.getLaunchIntentForPackage(context.packageName) ?: return
+    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    context.startActivity(launchIntent)
+    Runtime.getRuntime().exit(0)
+}
+
+/**
+ * Computes the update strategy based on BuildConfig values.
+ *
+ * @author Georgia Chatzimarkaki
+ */
+private fun currentUpdatePolicy(): UpdatePolicy {
+    val isUpdateAvailable = BuildConfig.LATEST_AVAILABLE_VERSION_CODE > BuildConfig.VERSION_CODE
+    return UpdatePolicy(
+        isUpdateAvailable = isUpdateAvailable,
+        isStoreUpdate = BuildConfig.IS_STORE_UPDATE
+    )
+}
+
+private data class UpdatePolicy(
+    val isUpdateAvailable: Boolean,
+    val isStoreUpdate: Boolean
+)
+
+private const val SILENT_UPDATE_WAIT_MS = 30_000L
 
 private const val PRIVACY_POLICY_URL = "https://usee.gr/privacy-policy"
 

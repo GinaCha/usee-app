@@ -15,4 +15,9 @@
     <string name="privacy_policy_link_label">Gizlilik Politikası</string>
     <string name="login_username_required_error">Kullanıcı adı zorunludur.</string>
     <string name="login_password_required_error">Şifre zorunludur.</string>
+    <string name="update_dialog_title">Güncelleme mevcut</string>
+    <string name="update_dialog_store_message">Bu uygulama için bir güncelleme mevcut. Kullanmaya devam etmek için lütfen mağazadan güncelleyin.</string>
+    <string name="update_dialog_silent_message">Bir güncelleme mevcut. Güncelleme indirilene kadar 30 saniye bekleyin, ardından uygulamayı yeniden başlatın.</string>
+    <string name="update_dialog_update_now">Şimdi güncelle</string>
+    <string name="update_dialog_restart_now">Şimdi yeniden başlat</string>
 </resources>
